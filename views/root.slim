@@ -35,7 +35,17 @@ html lang='en'
         display: inline-block
       .variant
         margin: 2px
-        // font-size: 0.9em
+      .progress
+          width: 100%
+          background-color: #ddd
+      .progress-bar
+          width: 0%
+          height: 30px
+          background-color: #4CAF50
+          text-align: center
+          line-height: 30px
+          color: white
+
   body
 
     img src='/logo.png' style='max-width: 400px'
@@ -53,23 +63,28 @@ html lang='en'
     #filters
       h1 Filters
       
-      / #category-filter
-      /   label for="category-filter-select" Category
-      /   select name='category-filter-select'
-      /     option value='all' All
-      /     option value='genres' Genres
-      /     option value='places' Places
-      /     option value='other' Other
-
       #search-filter
         form action="#"
           input type='submit' value='Search'
           input type='text'
       br
+
+      #randomize
+        label for='randomize' Give me random playlists
+        input#randomize-toggle name='randomize' type='checkbox'
+        br
+        button#randomize-reseed Reseed
         
       hr 
 
       h1#loading Loading tons of playlists, give it a sec ...
+      .progress
+        #progressBar.progress-bar role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='width:0%' 0%
+
+      #random-content style='display: none'
+        h1 Random Playlists
+        ul.items.random
+        .clearfix
 
       #content style='display: none'
         h1 Compilations
@@ -83,6 +98,10 @@ html lang='en'
         h1 Genres
         ul.items.genres
         .clearfix
+
+      br
+      br
+      br
 
     coffee:
 
@@ -143,8 +162,7 @@ html lang='en'
         window.data = groups
 
       sortVariants = (variants) ->
-        # order = ["Intro", "Pulse", "Edge", "2023"]]
-        # debugger
+        # todo, maybe, at some point
         variants
 
       dataLoaded = ->
@@ -184,10 +202,60 @@ html lang='en'
           else
             $items.show()
 
+      getData = (callback) ->
+        totalBytes = 6091957 # Replace with the actual file size
+        $.ajax
+          url: '/data'
+          type: 'GET'
+          xhr: ->
+            xhr = new window.XMLHttpRequest()
+            progressFn = (evt) ->
+              if evt.lengthComputable
+                console.log(evt.loaded)
+                percentComplete = (evt.loaded / totalBytes) * 100
+                $('#progressBar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete)
+                $('#progressBar').text(percentComplete.toFixed(2) + '%')
+            xhr.addEventListener "progress", progressFn, false
+            return xhr
+          success: (data) ->
+            callback(data)
+          error: (xhr, status, error) ->
+            # Handle errors here
+            alert("Error loading data. Please email nameless.identity1@gmail.com if this keeps happening")
+
+      reseedRandomContent = ->
+        allEntries = $("#content li.item")
+        indices = generateRandomNumbers(0, allEntries.length - 1, 10)
+        randomEntries = indices.map((index) -> allEntries[index])
+        $("#random-content ul.items").empty()
+        $("#random-content ul.items").append(randomEntries)
+
+      generateRandomNumbers = (min, max, count) ->
+        randomNumbers = new Set()
+        while randomNumbers.size < count
+          randomNumber = Math.floor(Math.random() * (max - min + 1)) + min
+          randomNumbers.add(randomNumber)
+        Array.from(randomNumbers)
+
+      addRandomizeListeners = ->
+        $("#randomize-toggle").on 'change', (e) ->
+          if $(this).is(':checked')
+            reseedRandomContent()
+            $("#random-content").show()
+            $("#content").hide()
+          else
+            $("#random-content").hide()
+            $("#content").show()
+
+        $("#randomize-reseed").on 'click', (e) ->
+          reseedRandomContent()
+
       $ ->
-        $.get '/data', (data) ->
+        getData (data) ->
           window.data = data
+          $(".progress").remove()
           dataLoaded()
           $("#content").show()
           setupFilters()
+          addRandomizeListeners()
 
