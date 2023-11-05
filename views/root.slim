@@ -202,18 +202,20 @@ html lang='en'
             $items.show()
 
       getData = (callback) ->
-        totalBytes = 6091957 # Replace with the actual file size
+        totalBytes = 1312538 # Replace with the actual file size
         $.ajax
           url: '/data'
           type: 'GET'
+          dataType: 'json',
+          contentType: 'application/json',
+
           xhr: ->
             xhr = new window.XMLHttpRequest()
             progressFn = (evt) ->
-              if evt.lengthComputable
-                console.log(evt.loaded)
-                percentComplete = (evt.loaded / totalBytes) * 100
-                $('#progressBar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete)
-                $('#progressBar').text(percentComplete.toFixed(2) + '%')
+              console.log(evt.loaded)
+              percentComplete = (evt.loaded / totalBytes) * 100
+              $('#progressBar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete)
+              $('#progressBar').text(percentComplete.toFixed(2) + '%')
             xhr.addEventListener "progress", progressFn, false
             return xhr
           success: (data) ->

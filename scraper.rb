@@ -12,7 +12,7 @@ USERS = [
   # "particleintroductor",
   # "thesoundsofspotify",
   # "particledetector",
-  "particledetector2023"
+  # "particledetector2023"
 ]
 
 def get_access_token
@@ -59,5 +59,17 @@ def get_playlists
     end
   end
 
-  results
+  data = Dir.glob("./data/*.json").map do |file|
+    JSON.parse(File.read(file))
+  end
+
+  # G zip the combined file
+  # We will gzip this send this to clients for faster load times
+  combined = data.flatten
+  File.open("./data/combined.json", "w") do |f|
+    f.write(combined.to_json)
+  end
+  `gzip ./data/combined.json`
+
+  nil
 end

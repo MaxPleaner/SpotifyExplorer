@@ -1,20 +1,14 @@
 require 'sinatra'
-require_relative './lib.rb'
-require 'json'
 require 'slim'
 require 'byebug'
-
-data = Dir.glob("./data/*.json").map do |file|
-  JSON.parse(File.read(file))
-end
-# byebug
-COMBINED_DATA = data.flatten
 
 get '/' do
   slim :root
 end
 
 get '/data' do
-  content_type :json
-  COMBINED_DATA.to_json
+  content_type 'application/json'
+  headers['Content-Encoding'] = 'gzip'
+  send_file 'data/combined.json.gz', type: :json, disposition: 'attachment'
+  # send_file('./data/combined.json.gz', filename: "data.gz")
 end
