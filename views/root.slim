@@ -188,13 +188,12 @@ html lang='en'
         $("#search-filter form").on 'submit', (e) ->
           e.preventDefault()
 
-          $items = $('.item')
+          $items = $('#content .item')
           search = $("#search-filter input[type='text'").val()
           if search.length > 0
             tokens = search.split(" ")
             $items.each (index, item) ->
               itemText = $(item).find(".name").text().toLowerCase()
-              # debugger
               if tokens.every((token) -> itemText.indexOf(token.toLowerCase()) != -1)
                 $(item).show()
               else
@@ -228,7 +227,7 @@ html lang='en'
         indices = generateRandomNumbers(0, allEntries.length - 1, 10)
         randomEntries = indices.map((index) -> allEntries[index])
         $("#random-content ul.items").empty()
-        $("#random-content ul.items").append(randomEntries)
+        $("#random-content ul.items").append($(randomEntries).clone().show())
 
       generateRandomNumbers = (min, max, count) ->
         randomNumbers = new Set()
