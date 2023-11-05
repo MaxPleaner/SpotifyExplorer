@@ -213,7 +213,7 @@ html lang='en'
             xhr = new window.XMLHttpRequest()
             progressFn = (evt) ->
               console.log(evt.loaded)
-              percentComplete = Math.max(99, (evt.loaded / totalBytes) * 100)
+              percentComplete = Math.min(99, (evt.loaded / totalBytes) * 100)
               $('#progressBar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete)
               $('#progressBar').text(percentComplete.toFixed(2) + '%')
             xhr.addEventListener "progress", progressFn, false
