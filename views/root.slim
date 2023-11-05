@@ -1,0 +1,193 @@
+doctype html
+html lang='en'
+  head
+    script{
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    }
+    sass:
+      body
+        background-color: black
+        color: white
+        font-family: Monospace
+      .clearfix
+        clear: both
+      a, a:visited
+        color: lightgreen
+      a:hover
+        color: darkgreen
+      #loading
+        color: red
+      .name
+        font-size: 1.2em
+        font-weight: bold
+      .items
+        list-style: none
+      .item
+        float: left
+        border: 1px solid grey
+        border-radius: 10px
+        margin: 5px
+        padding: 5px
+        display: inline-block
+      .variants
+        display: inline-block
+      .variant
+        margin: 2px
+        // font-size: 0.9em
+  body
+
+    img src='/logo.png' style='max-width: 400px'
+
+    br
+    small style='margin-left: 10px'
+      span a 
+      a href='https://dissonant.info' dissonant.info
+      span  production
+    br
+    br
+
+    hr
+
+    #filters
+      h1 Filters
+      
+      / #category-filter
+      /   label for="category-filter-select" Category
+      /   select name='category-filter-select'
+      /     option value='all' All
+      /     option value='genres' Genres
+      /     option value='places' Places
+      /     option value='other' Other
+
+      #search-filter
+        form action="#"
+          input type='submit' value='Search'
+          input type='text'
+      br
+        
+      hr 
+
+      h1#loading Loading tons of playlists, give it a sec ...
+
+      #content style='display: none'
+        h1 Compilations
+        ul.items.other
+        .clearfix
+
+        h1 Places
+        ul.items.places
+        .clearfix
+
+        h1 Genres
+        ul.items.genres
+        .clearfix
+
+    coffee:
+
+      categoryName = (item, variant) ->
+        if ["Intro", "Sound", "Pulse", "Edge"].includes(variant)
+          "genres"
+        else if ["Current", "Emerging", "Underground", "Needle"].includes(variant)
+          "places"
+        else
+          "other"
+
+      baseName = (item) ->
+        if ["The Needle", "The Needle - Current", "The Needle - Emerging", "The Needle - Underground"].includes(item.name)
+          "The Needle"
+        else
+          item.name
+            .replace("The Sound of ", "")
+            .replace("The Pulse of ", "")
+            .replace("The Edge of ", "")
+            .replace("Intro to ", "")
+            .replace("The Needle", "")
+            .replace(" - Current", "")
+            .replace(" - Emerging", "")
+            .replace(" - Underground", "")
+            .replace(" / ", "")
+
+      variantName = (item) =>
+        if item.name.startsWith("The Sound of")
+          "Sound"
+        else if item.name.startsWith("The Pulse of")
+          "Pulse"
+        else if item.name.startsWith("The Edge of")
+          "Edge"
+        else if item.name.startsWith("The Needle")
+          if item.name.endsWith(" - Current")
+            "Current"
+          else if item.name.endsWith(" - Emerging")
+            "Emerging"
+          else if item.name.endsWith(" - Underground")
+            "Underground"
+          else
+            "Needle"
+        else if item.name.startsWith("Intro to")
+          "Intro"
+        else
+          "Link"
+
+      groupData = ->
+        groups = {}
+        data.forEach (item) =>
+          variant = variantName(item)
+          category = (groups[categoryName(item, variant)] ?= {})
+          variants = (category[baseName(item)] ?= {})
+          variants[variantName(item)] = item
+          # if baseName(item).length == 0
+          #   debugger
+
+        window.data = groups
+
+      sortVariants = (variants) ->
+        # order = ["Intro", "Pulse", "Edge", "2023"]]
+        # debugger
+        variants
+
+      dataLoaded = ->
+        groupData()
+        $('#loading').remove()
+        Object.entries(data).forEach ([category, categoryItems]) =>
+          Object.entries(categoryItems).forEach ([baseName, variants]) =>
+            $item = $("
+              <li class='item' data-category=#{categoryName}>
+                <span class='name'>#{baseName}</span>
+                <div class='variants'></div>
+              </li>
+            ")
+
+            sortVariants(Object.entries(variants)).forEach ([variantName, item], index) =>
+              $item.find('.variants').append $("
+                <a class='variant' href='#{item.uri}' target='_blank'>#{variantName}</a>
+              ")
+
+            $(".#{category}").append($item)
+
+      setupFilters = ->
+        $("#search-filter form").on 'submit', (e) ->
+          e.preventDefault()
+
+          $items = $('.item')
+          search = $("#search-filter input[type='text'").val()
+          if search.length > 0
+            tokens = search.split(" ")
+            $items.each (index, item) ->
+              itemText = $(item).find(".name").text().toLowerCase()
+              # debugger
+              if tokens.every((token) -> itemText.indexOf(token.toLowerCase()) != -1)
+                $(item).show()
+              else
+                $(item).hide()
+          else
+            $items.show()
+
+      $ ->
+        $.get '/data', (data) ->
+          window.data = data
+          dataLoaded()
+          $("#content").show()
+          setupFilters()
+
