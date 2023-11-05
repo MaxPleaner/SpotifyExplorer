@@ -6,3 +6,4 @@ gem 'dotenv'
 gem 'byebug'
 gem 'slim'
 gem 'coffee-script'
+gem "rack"

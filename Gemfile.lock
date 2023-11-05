@@ -34,11 +34,13 @@ GEM
 
 PLATFORMS
   arm64-darwin-23
+  armv7l-linux-eabihf
 
 DEPENDENCIES
   byebug
   coffee-script
   dotenv
+  rack
   sinatra
   sinatra-contrib
   slim

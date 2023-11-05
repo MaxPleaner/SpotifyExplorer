@@ -7,7 +7,7 @@ require 'byebug'
 data = Dir.glob("./data/*.json").map do |file|
   JSON.parse(File.read(file))
 end
-byebug
+# byebug
 COMBINED_DATA = data.flatten
 
 get '/' do
