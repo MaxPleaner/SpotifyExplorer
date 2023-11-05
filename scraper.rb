@@ -9,10 +9,10 @@ CLIENT_SECRET = ENV.fetch("CLIENT_SECRET")
 
 # We will scrape these users' playlists
 USERS = [
-  # "particleintroductor",
-  # "thesoundsofspotify",
-  # "particledetector",
-  # "particledetector2023"
+  "particleintroductor",
+  "thesoundsofspotify",
+  "particledetector",
+  "particledetector2023"
 ]
 
 def get_access_token
@@ -25,6 +25,16 @@ def get_access_token
   JSON.parse(`#{cmd}`)["access_token"]
 end
 
+TOKEN = get_access_token
+
+def send_curl(url)
+  cmd = <<-SH
+    curl "#{url}" \
+        -H "Authorization: Bearer  #{TOKEN}"
+  SH
+  JSON.parse(`#{cmd}`)
+end
+
 def get_playlists
   token = get_access_token
   results = []
@@ -34,11 +44,7 @@ def get_playlists
 
     loop do
       puts "fetching #{url}"
-      cmd = <<-SH
-        curl "#{url}" \
-            -H "Authorization: Bearer  #{token}"
-      SH
-      result = JSON.parse(`#{cmd}`)
+      result = send_curl(url)
       results << result
       url = result["next"]
       break if url.nil?

@@ -22,7 +22,7 @@ Hosted at https://spotify-explorer.dissonant.info
 # Usage
 
 1. Run `bundle`
-2. To run scraper, first copy `.env.example` to `.env` and enter your Spotify Developer API credentials there (create a Web API project), Then run `ruby -r './scraper.rb' -e 'get_playlists'. This will save some static JSON files which are used by the server.
+2. To run scraper, first copy `.env.example` to `.env` and enter your Spotify Developer API credentials there (create a Web API project), Then run `ruby -r './scraper.rb' -e 'get_playlists'`. This will save some static JSON files which are used by the server.
 3. To run server, `env RACK_ENV=production rackup -p 9294` (change port num as needed)
 
 # Architecture
