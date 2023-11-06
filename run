@@ -1,3 +1,0 @@
-#!/usr/bin/bash
-
-env RACK_ENV=production rackup -p 9294

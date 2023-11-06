@@ -9,10 +9,10 @@ CLIENT_SECRET = ENV.fetch("CLIENT_SECRET")
 
 # We will scrape these users' playlists
 USERS = [
-  "particleintroductor",
-  "thesoundsofspotify",
-  "particledetector",
-  "particledetector2023"
+  # "particleintroductor",
+  # "thesoundsofspotify",
+  # "particledetector",
+  # "particledetector2023"
 ]
 
 def get_access_token
@@ -35,6 +35,14 @@ def send_curl(url)
   JSON.parse(`#{cmd}`)
 end
 
+def get_recommendations_test
+  token = get_access_token
+  url = "https://api.spotify.com/v1/recommendations?seed_genres=metal,jazz"
+  result = send_curl(url)
+  data = result["tracks"].map { |x| [x["artists"].map { |a| a["name"] }.join(","), x["name"]] }
+  byebug
+end
+
 def get_playlists
   token = get_access_token
   results = []
@@ -50,6 +58,7 @@ def get_playlists
       break if url.nil?
     end
 
+    byebug
     items = results.map { |r| r["items"] }.flatten
     data = items.map do |item|
       {
@@ -75,7 +84,7 @@ def get_playlists
   File.open("./data/combined.json", "w") do |f|
     f.write(combined.to_json)
   end
-  `gzip ./data/combined.json`
+  # `gzip ./data/combined.json`
 
   nil
 end

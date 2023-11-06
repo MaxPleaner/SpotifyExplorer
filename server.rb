@@ -3,6 +3,7 @@ require 'slim'
 require 'byebug'
 
 get '/' do
+  # @data = File.read('data/combined.json')
   slim :root
 end
 

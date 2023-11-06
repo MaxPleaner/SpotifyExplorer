@@ -48,6 +48,9 @@ html lang='en'
 
   body
 
+    / #data style='display: none'
+    /   = @data
+
     img src='/logo.png' style='max-width: 400px'
 
     br
@@ -201,7 +204,15 @@ html lang='en'
           else
             $items.show()
 
+
       getData = (callback) ->
+        # getDataUsingEmbedded(callback)
+        getDataUsingAjax(callback)
+
+      getDataUsingEmbedded = (callback) ->
+        callback(JSON.parse($("#data").text()))
+
+      getDataUsingAjax = (callback) ->
         totalBytes = 1312538 # Replace with the actual file size
         $.ajax
           url: '/data'
