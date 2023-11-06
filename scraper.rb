@@ -84,7 +84,7 @@ def get_playlists
   File.open("./data/combined.json", "w") do |f|
     f.write(combined.to_json)
   end
-  # `gzip ./data/combined.json`
+  `gzip ./data/combined.json`
 
   nil
 end
