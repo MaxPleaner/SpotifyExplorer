@@ -1,5 +1,6 @@
 source "http://rubygems.org"
 
+gem "sass-embedded"
 gem "sinatra"
 gem "sinatra-contrib"
 gem 'dotenv'
