@@ -233,6 +233,7 @@ html lang='en'
             callback(data)
           error: (xhr, status, error) ->
             # Handle errors here
+            console.log(error)
             alert("Error loading data. Please email nameless.identity1@gmail.com if this keeps happening")
 
       reseedRandomContent = ->
